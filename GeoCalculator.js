@@ -31,7 +31,10 @@ const GeoCalculator = ({route, navigation}) => {
         }
         return false;
     }
-    const Calculate = () => {
+    const DisplayResults = () =>{
+      Calculate(distanceUnit, bearingUnit);
+    }
+    const Calculate = (dUnit, bUnit) => {
       console.log("get in here?")
         if(formValidate(sourceLat) && formValidate(sourceLong) 
         && formValidate(targetLat) 
@@ -40,12 +43,12 @@ const GeoCalculator = ({route, navigation}) => {
         const calDistance = computeDistance(sourceLat, sourceLong, targetLat, targetLong);
 
         const calBearing = computeBearing(sourceLat, sourceLong, targetLat, targetLong);
-        const updatedDistance = (distanceUnit === "Miles") ? (calDistance *0.621371) : calDistance;
+        const updatedDistance = (dUnit === "Miles") ? round((calDistance *0.621371),3) : calDistance;
         console.log(distanceUnit);
-        setdistance(`${updatedDistance} ${distanceUnit}`);
-        const updatedBearing = (bearingUnit === "Mils") ? (calBearing * 17.777777777778) : calBearing;
+        setdistance(`${updatedDistance} ${dUnit}`);
+        const updatedBearing = (bUnit === "Mils") ? (calBearing * 17.777777777778) : calBearing;
         console.log(bearingUnit);
-        setbearing(`${round(updatedBearing,3)} ${bearingUnit}`);
+        setbearing(`${round(updatedBearing,3)} ${bUnit}`);
         }else{
             console.log("One of the field is empty.");
         }
@@ -116,22 +119,23 @@ navigation.setOptions({
  
 useEffect(() =>{
   
+  let updatedDistanceUnit = ""; //route.params.distanceUnit;
+  let updatedBearingUnit =  ""; //route.params.bearingUnit;
   if(route.params?.distanceUnit){
     console.log("update distance");
-    
+    updatedDistanceUnit = route.params.distanceUnit;
     setdistanceUnit(route.params.distanceUnit);
     console.log(route.params.distanceUnit);
-    console.log(distanceUnit);
   }
   if(route.params?.bearingUnit){
     console.log("Update bearing");
     console.log(route.params.bearingUnit);
-    let something = route.params.bearingUnit;
-    console.log(something);
-    setbearingUnit(something);
-    console.log(bearingUnit);
+    updatedBearingUnit =  route.params.bearingUnit;
+    
+    setbearingUnit( route.params.bearingUnit);
+    
   }
-  Calculate();
+  Calculate(updatedDistanceUnit, updatedBearingUnit);
 }, [route.params?.distanceUnit, route.params?.bearingUnit]);
     return (
       <TouchableWithoutFeedback  onPress={Keyboard.dismiss}>
@@ -141,7 +145,7 @@ useEffect(() =>{
             <Input placeholder="Enter longtitude for point 1" value={sourceLong} style={styles.inputStyle} errorMessage = {validateValue(sourceLong)}  onChangeText = {setsourceLong}/>
             <Input placeholder="Enter latitude for point 2" value={targetLat} style={styles.inputStyle} errorMessage = {validateValue(targetLat)}  onChangeText = {settargetLat}/>
             <Input placeholder="Enter longtitude for point 2" value={targetLong} style={styles.inputStyle} errorMessage = {validateValue(targetLong)}  onChangeText = {settargetLong} />
-            <Button title="Calculate" onPress = {Calculate}></Button>
+            <Button title="Calculate" onPress = {DisplayResults}></Button>
             <View style={styles.spacer} ></View>
             <Button title="Clear" onPress = {ClearAll}></Button>        
         </View>
