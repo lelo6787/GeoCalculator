@@ -35,7 +35,6 @@ const GeoCalculator = ({route, navigation}) => {
       Calculate(distanceUnit, bearingUnit);
     }
     const Calculate = (dUnit, bUnit) => {
-      console.log("get in here?")
         if(formValidate(sourceLat) && formValidate(sourceLong) 
         && formValidate(targetLat) 
         && formValidate(targetLong)){
