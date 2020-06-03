@@ -12,8 +12,6 @@ const History = ({route, navigation}) => {
     const unit = "";
     const bunit ="";
     const buttonPress = (item) => {
-        console.log("Hello world");
-        console.log(item);
         navigation.navigate('GeoCalculator', {item});
     }
     const renderHistory = ({item, index}) =>{
@@ -21,8 +19,8 @@ const History = ({route, navigation}) => {
     
         <TouchableHighlight style={styles.timeStyle} onPress={()=> buttonPress(item)}>
             <View>
-        <Text>{' '} Start: {item.sourceLat}, {item.sourceLong}</Text>
-        <Text>{' '} End: {item.targetLat}, {item.targetLong}</Text>
+        <Text style={styles.itemText}>{' '} Start: {item.sourceLat}, {item.sourceLong}</Text>
+        <Text style={styles.itemText}>{' '} End: {item.targetLat}, {item.targetLong}</Text>
         <Text style={styles.text}>{item.caltime}</Text>
         </View>
         </TouchableHighlight>
@@ -52,6 +50,11 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontStyle: 'italic',
     fontSize: 12,
+    marginRight: 5
+    },
+    itemText: { 
+        fontSize: 15,
+        fontWeight: "bold",
     }
    });
 export default History;
