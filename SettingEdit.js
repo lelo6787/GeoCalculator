@@ -8,7 +8,7 @@ import { color } from 'react-native-reanimated';
 const SettingEdit = ({route, navigation}) => {
     const initialDistanceUnit = route.params.distanceUnit;
     const initialBearingUnit = route.params.bearingUnit;
-    
+    const [item] = useState('');
     const [distanceUnit, setdistanceUnit] = useState(initialDistanceUnit);
     const [bearingUnit, setbearingUnit] = useState(initialBearingUnit);
     
@@ -38,7 +38,7 @@ const SettingEdit = ({route, navigation}) => {
             <TouchableOpacity
             onPress={() => {
             
-            navigation.navigate('GeoCalculator', {distanceUnit,bearingUnit})}
+            navigation.navigate('GeoCalculator', {distanceUnit,bearingUnit, item})}
           }
           >
           <Text style={styles.text}>Save</Text>

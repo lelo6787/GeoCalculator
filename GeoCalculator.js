@@ -4,7 +4,8 @@ import {Button} from "react-native-elements";
 import {Input} from "react-native-elements";
 import { Feather } from '@expo/vector-icons'; 
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
+import {initFireBaseDB, writeData,setupDataListener } from './FirebaseGeoCalculatorDB.js';
+import { color } from "react-native-reanimated";
 const GeoCalculator = ({route, navigation}) => {
     const [sourceLat, setsourceLat] = useState('');
     const [sourceLong, setsourceLong] = useState('');
@@ -15,7 +16,8 @@ const GeoCalculator = ({route, navigation}) => {
    // const [distanceUnit, setdistanceUnit] = useState('Kilometers');
     const [distanceUnit, setdistanceUnit] = useState('Kilometers');
     const [bearingUnit, setbearingUnit] = useState('Degrees');
-
+    const [history, setHistory] = useState([]);
+    const [item, setitem] = useState({});
     const ClearAll = () => {
         Keyboard.dismiss();
         setsourceLat('');
@@ -48,6 +50,10 @@ const GeoCalculator = ({route, navigation}) => {
         const updatedBearing = (bUnit === "Mils") ? (calBearing * 17.777777777778) : calBearing;
         console.log(bearingUnit);
         setbearing(`${round(updatedBearing,3)} ${bUnit}`);
+        //add to database
+        const currentDate = Date();
+        writeData({sourceLat: sourceLat, sourceLong: sourceLong, targetLat: targetLat,
+           targetLong: targetLong, caltime: currentDate.toString()});
         }else{
             console.log("One of the field is empty.");
         }
@@ -114,8 +120,29 @@ navigation.setOptions({
 <Feather name="settings" size={24} color="white" style={{marginRight: 10}}/>
 </TouchableOpacity>
   ),
+  headerLeft: () => (
+    <TouchableOpacity
+    onPress={() => 
+    navigation.navigate('History', history)
+  }
+  
+  >
+    <Text style={{color: 'white', fontWeight: "bold"}}>History</Text>
+  </TouchableOpacity>
+  )
 });
- 
+//call once to initialize firebase
+useEffect(() =>{
+  try {
+  initFireBaseDB();
+  } catch(err) {
+    console.log(err);
+  }
+  setupDataListener(items => {
+    setHistory(items);
+   
+  })
+}, []); 
 useEffect(() =>{
   
   let updatedDistanceUnit = ""; //route.params.distanceUnit;
@@ -133,9 +160,20 @@ useEffect(() =>{
     
     setbearingUnit( route.params.bearingUnit);
     
+    
   }
+  if(route.params?.item){
+    setsourceLat(route.params.item.sourceLat);
+    setsourceLong(route.params.item.sourceLong);
+    settargetLat(route.params.item.targetLat);
+    settargetLong(route.params.item.targetLong);
+    setdistance('');
+    setbearing('');
+  }
+  else {
   Calculate(updatedDistanceUnit, updatedBearingUnit);
-}, [route.params?.distanceUnit, route.params?.bearingUnit]);
+  }
+}, [route.params?.distanceUnit, route.params?.bearingUnit,route.params?.item]);
     return (
       <TouchableWithoutFeedback  onPress={Keyboard.dismiss}>
       <SafeAreaView  style={styles.container}>
@@ -217,8 +255,10 @@ const styles = StyleSheet.create({
     padding: 10
   },
   text: {
-    fontWeight: "bold"
+    fontWeight: "bold",
+    padding: 5
   }
+
 
  });
 export default GeoCalculator;
