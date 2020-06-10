@@ -6,6 +6,28 @@ import { Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import {initFireBaseDB, writeData,setupDataListener } from './FirebaseGeoCalculatorDB.js';
 import { color } from "react-native-reanimated";
+import {getWeather} from './WeatherApi.js';
+
+
+const ICONS = {
+  img01d: require('./assets/img01d.png'),
+  img01n: require('./assets/img01n.png'),
+  img02d: require('./assets/img02d.png'),
+  img02n: require('./assets/img02n.png'),
+  img03d: require('./assets/img03d.png'),
+  img03n: require('./assets/img03n.png'),
+  img04d: require('./assets/img04d.png'),
+  img04n: require('./assets/img04n.png'),
+  img09d: require('./assets/img09d.png'),
+  img09n: require('./assets/img09n.png'),
+  img10d: require('./assets/img10d.png'),
+  img10n: require('./assets/img10n.png'),
+  img13d: require('./assets/img13d.png'),
+  img13n: require('./assets/img13n.png'),
+  img50d: require('./assets/img13d.png'),
+  img50n: require('./assets/img13n.png'),
+};
+ 
 const GeoCalculator = ({route, navigation}) => {
     const [sourceLat, setsourceLat] = useState('');
     const [sourceLong, setsourceLong] = useState('');
@@ -18,6 +40,8 @@ const GeoCalculator = ({route, navigation}) => {
     const [bearingUnit, setbearingUnit] = useState('Degrees');
     const [history, setHistory] = useState([]);
     const [item, setitem] = useState({});
+    const [sourceWeather, setSourceWeater] = useState({});
+    const [targetWeather, settargetWeather] = useState({});
     const ClearAll = () => {
         Keyboard.dismiss();
         setsourceLat('');
@@ -36,7 +60,24 @@ const GeoCalculator = ({route, navigation}) => {
     const DisplayResults = () =>{
       Calculate(distanceUnit, bearingUnit);
     }
+    const callback = (data) => {
+      console.log("weather first");
+        console.log(data);
+    }
     const Calculate = (dUnit, bUnit) => {
+     
+         //get the weather outlook from the entered lat and lon
+     /*    getWeather(sourceLat, sourceLong, (data => {
+          setSourceWeater(data);
+          console.log(sourceWeather);
+        } ));
+
+        getWeather(targetLat, targetLong, (data => {
+          settargetWeather(data);
+          console.log(targetWeather);
+        } ));
+*/
+
         if(formValidate(sourceLat) && formValidate(sourceLong) 
         && formValidate(targetLat) 
         && formValidate(targetLong)){
@@ -54,6 +95,19 @@ const GeoCalculator = ({route, navigation}) => {
         const currentDate = Date();
         writeData({sourceLat: sourceLat, sourceLong: sourceLong, targetLat: targetLat,
            targetLong: targetLong, caltime: currentDate.toString()});
+        
+        //get the weather outlook from the entered lat and lon
+         //get the weather outlook from the entered lat and lon
+         getWeather(sourceLat, sourceLong, (data => {
+          setSourceWeater(data);
+          console.log(sourceWeather);
+        } ));
+
+        getWeather(targetLat, targetLong, (data => {
+          settargetWeather(data);
+          console.log(targetWeather);
+        } ));
+
         }else{
             console.log("One of the field is empty.");
         }
@@ -199,9 +253,16 @@ useEffect(() =>{
         </View>
         <View style={styles.b4}>
             <Text style={styles.text}>{bearing}</Text>
+        </View> 
+        <Image
+           style={{ width: 100, height: 100 }}
+           source={require('./img01n.png')}
+         />
         </View>
-        </View>
+       
+
         </SafeAreaView>
+       
    </TouchableWithoutFeedback>
     );
 }
@@ -257,6 +318,9 @@ const styles = StyleSheet.create({
   text: {
     fontWeight: "bold",
     padding: 5
+  },
+  weatherView: {
+    
   }
 
 
