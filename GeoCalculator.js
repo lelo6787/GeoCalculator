@@ -1,11 +1,34 @@
 import React, { useState, useEffect} from "react";
-import {StyleSheet, Text, View, TextInput, Keyboard, SafeAreaView, TouchableWithoutFeedback} from "react-native";
+import {StyleSheet, Text, View, TextInput, Keyboard, SafeAreaView, 
+  TouchableWithoutFeedback, Image} from "react-native";
 import {Button} from "react-native-elements";
 import {Input} from "react-native-elements";
 import { Feather } from '@expo/vector-icons'; 
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import {initFireBaseDB, writeData,setupDataListener } from './FirebaseGeoCalculatorDB.js';
 import { color } from "react-native-reanimated";
+import {getWeather} from './WeatherApi.js';
+
+
+const ICONS = {
+  img01d: require('./assets/img01d.png'),
+  img01n: require('./assets/img01n.png'),
+  img02d: require('./assets/img02d.png'),
+  img02n: require('./assets/img02n.png'),
+  img03d: require('./assets/img03d.png'),
+  img03n: require('./assets/img03n.png'),
+  img04d: require('./assets/img04d.png'),
+  img04n: require('./assets/img04n.png'),
+  img09d: require('./assets/img09d.png'),
+  img09n: require('./assets/img09n.png'),
+  img10d: require('./assets/img10d.png'),
+  img10n: require('./assets/img10n.png'),
+  img13d: require('./assets/img13d.png'),
+  img13n: require('./assets/img13n.png'),
+  img50d: require('./assets/img13d.png'),
+  img50n: require('./assets/img13n.png'),
+};
+ 
 const GeoCalculator = ({route, navigation}) => {
     const [sourceLat, setsourceLat] = useState('');
     const [sourceLong, setsourceLong] = useState('');
@@ -18,6 +41,8 @@ const GeoCalculator = ({route, navigation}) => {
     const [bearingUnit, setbearingUnit] = useState('Degrees');
     const [history, setHistory] = useState([]);
     const [item, setitem] = useState({});
+    const [sourceWeather, setSourceWeater] = useState({icon: '', description: '', tempature: ''});
+    const [targetWeather, settargetWeather] = useState({icon: '', description: '', tempature: ''});
     const ClearAll = () => {
         Keyboard.dismiss();
         setsourceLat('');
@@ -36,7 +61,24 @@ const GeoCalculator = ({route, navigation}) => {
     const DisplayResults = () =>{
       Calculate(distanceUnit, bearingUnit);
     }
+    const callback = (data) => {
+      console.log("weather first");
+        console.log(data);
+    }
     const Calculate = (dUnit, bUnit) => {
+     
+         //get the weather outlook from the entered lat and lon
+     /*    getWeather(sourceLat, sourceLong, (data => {
+          setSourceWeater(data);
+          console.log(sourceWeather);
+        } ));
+
+        getWeather(targetLat, targetLong, (data => {
+          settargetWeather(data);
+          console.log(targetWeather);
+        } ));
+*/
+
         if(formValidate(sourceLat) && formValidate(sourceLong) 
         && formValidate(targetLat) 
         && formValidate(targetLong)){
@@ -54,6 +96,21 @@ const GeoCalculator = ({route, navigation}) => {
         const currentDate = Date();
         writeData({sourceLat: sourceLat, sourceLong: sourceLong, targetLat: targetLat,
            targetLong: targetLong, caltime: currentDate.toString()});
+        
+        //get the weather outlook from the entered lat and lon
+         //get the weather outlook from the entered lat and lon
+         getWeather(sourceLat, sourceLong, (data => {
+          setSourceWeater({icon: data.weather[0].icon, description: data.weather[0].description, tempature: data.main.temp});
+         // setSourceWeater(data);
+
+        
+        } ));
+
+        getWeather(targetLat, targetLong, (data => {
+          settargetWeather({icon: data.weather[0].icon, description: data.weather[0].description, tempature: data.main.temp});
+        
+        } ));
+
         }else{
             console.log("One of the field is empty.");
         }
@@ -174,6 +231,30 @@ useEffect(() =>{
   Calculate(updatedDistanceUnit, updatedBearingUnit);
   }
 }, [route.params?.distanceUnit, route.params?.bearingUnit,route.params?.item]);
+
+const renderWeather = (weather) => {
+  
+  if (weather.icon === '') {
+    return <View></View>;
+  } else {
+    console.log(weather);
+    return (
+      <View style={styles.weatherView}>
+         <Image
+           style={{ width: 100, height: 100 }}
+           source={ICONS['img' + weather.icon]}
+         />
+         <View>
+           <Text style={{ fontSize: 56, fontWeight: 'bold' }}>
+             {round(weather.tempature,0)}
+           </Text>
+           <Text> {weather.description} </Text>
+         </View>
+       </View>
+    );
+  }
+};
+
     return (
       <TouchableWithoutFeedback  onPress={Keyboard.dismiss}>
       <SafeAreaView  style={styles.container}>
@@ -199,9 +280,16 @@ useEffect(() =>{
         </View>
         <View style={styles.b4}>
             <Text style={styles.text}>{bearing}</Text>
+        </View> 
+       
+      {renderWeather(sourceWeather)}
+      {renderWeather(targetWeather)}
+
         </View>
-        </View>
+       
+
         </SafeAreaView>
+       
    </TouchableWithoutFeedback>
     );
 }
@@ -257,6 +345,9 @@ const styles = StyleSheet.create({
   text: {
     fontWeight: "bold",
     padding: 5
+  },
+  weatherView: {
+    
   }
 
 
