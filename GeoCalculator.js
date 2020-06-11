@@ -43,6 +43,7 @@ const GeoCalculator = ({route, navigation}) => {
     const [item, setitem] = useState({});
     const [sourceWeather, setSourceWeater] = useState({icon: '', description: '', tempature: ''});
     const [targetWeather, settargetWeather] = useState({icon: '', description: '', tempature: ''});
+
     const ClearAll = () => {
         Keyboard.dismiss();
         setsourceLat('');
@@ -102,13 +103,12 @@ const GeoCalculator = ({route, navigation}) => {
          getWeather(sourceLat, sourceLong, (data => {
           setSourceWeater({icon: data.weather[0].icon, description: data.weather[0].description, tempature: data.main.temp});
          // setSourceWeater(data);
-
         
         } ));
 
         getWeather(targetLat, targetLong, (data => {
           settargetWeather({icon: data.weather[0].icon, description: data.weather[0].description, tempature: data.main.temp});
-        
+
         } ));
 
         }else{
@@ -284,7 +284,6 @@ const renderWeather = (weather) => {
        
       {renderWeather(sourceWeather)}
       {renderWeather(targetWeather)}
-
         </View>
        
 
