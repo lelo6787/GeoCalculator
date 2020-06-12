@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import {weatherApikey} from './WeatherAPIKey.js';
 const lat = 42.9634;
 const lon = 85.6681;
 const OpenMapServer = axios.create({
@@ -25,7 +25,7 @@ OpenMapServer.interceptors.request.use(
 
     export const getWeather = async (lat, long, callback) => {
         const response = await OpenMapServer.get(
-            `?lat=${lat}&lon=${long}&units=imperial&appid=5e6a65c8b51045ae43ef4f6f839d564c`
+            `?lat=${lat}&lon=${long}&units=imperial&appid=${weatherApikey}`
         );
         callback(response.data);
     }

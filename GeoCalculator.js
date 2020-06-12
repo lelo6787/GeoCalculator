@@ -41,8 +41,13 @@ const GeoCalculator = ({route, navigation}) => {
     const [bearingUnit, setbearingUnit] = useState('Degrees');
     const [history, setHistory] = useState([]);
     const [item, setitem] = useState({});
-    const [sourceWeather, setSourceWeater] = useState({icon: '', description: '', tempature: ''});
-    const [targetWeather, settargetWeather] = useState({icon: '', description: '', tempature: ''});
+    const initialWeatherState = {
+      icon: '',
+      description: '',
+      tempature: ''
+    }
+    const [sourceWeather, setSourceWeater] = useState(initialWeatherState);
+    const [targetWeather, settargetWeather] = useState(initialWeatherState);
 
     const ClearAll = () => {
         Keyboard.dismiss();
@@ -52,6 +57,8 @@ const GeoCalculator = ({route, navigation}) => {
         settargetLong('');
         setdistance('');
         setbearing('');
+        setSourceWeater(initialWeatherState);
+        settargetWeather(initialWeatherState);
     }
     const formValidate = (val) =>{
         if(val && !isNaN(val)){
@@ -68,17 +75,6 @@ const GeoCalculator = ({route, navigation}) => {
     }
     const Calculate = (dUnit, bUnit) => {
      
-         //get the weather outlook from the entered lat and lon
-     /*    getWeather(sourceLat, sourceLong, (data => {
-          setSourceWeater(data);
-          console.log(sourceWeather);
-        } ));
-
-        getWeather(targetLat, targetLong, (data => {
-          settargetWeather(data);
-          console.log(targetWeather);
-        } ));
-*/
 
         if(formValidate(sourceLat) && formValidate(sourceLong) 
         && formValidate(targetLat) 
@@ -217,7 +213,7 @@ useEffect(() =>{
     
     setbearingUnit( route.params.bearingUnit);
     
-    
+
   }
   if(route.params?.item){
     setsourceLat(route.params.item.sourceLat);
@@ -281,11 +277,10 @@ const renderWeather = (weather) => {
         <View style={styles.b4}>
             <Text style={styles.text}>{bearing}</Text>
         </View> 
-       
-      {renderWeather(sourceWeather)}
-      {renderWeather(targetWeather)}
+        {renderWeather(sourceWeather)}
+        {renderWeather(targetWeather)}
         </View>
-       
+        
 
         </SafeAreaView>
        
@@ -346,7 +341,12 @@ const styles = StyleSheet.create({
     padding: 5
   },
   weatherView: {
-    
+    flexDirection: 'row',
+    width: '100%',
+    backgroundColor: '#ADD8E6',
+    marginTop: 5,
+   
+ //   flex: 1
   }
 
 

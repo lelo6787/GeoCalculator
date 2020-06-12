@@ -4,7 +4,10 @@ import {firebaseConfig } from './FirebaseConfig.js';
 import { lessOrEq } from 'react-native-reanimated';
 export function initFireBaseDB()
 {
+    if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
+     }
+   
 }
 export function writeData(data) {
     firebase.database().ref(`geocalculator`).push(data);
